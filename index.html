@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Museum of Promised Efficiencies</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gallery: {
+                            950: '#07090e',
+                            900: '#0d1117',
+                            gold: '#c5a059',
+                            goldLight: '#e4c98f',
+                            wall: '#e2dbd1'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'Georgia', 'serif'],
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        cinzel: ['Cinzel', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- GSAP for Cinematic Blur Transitions -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,700;1,400;1,600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #07090e;
+            color: #e2e8f0;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* Warm Gallery Wall Surface with Overhead Spotlights */
+        .museum-wall-bg {
+            background-color: #e2dbd1;
+            background-image: 
+                radial-gradient(ellipse 500px 380px at 20% 0%, rgba(255, 255, 245, 0.75) 0%, rgba(226, 219, 209, 0) 100%),
+                radial-gradient(ellipse 650px 420px at 50% 0%, rgba(255, 255, 245, 0.9) 0%, rgba(226, 219, 209, 0) 100%),
+                radial-gradient(ellipse 500px 380px at 80% 0%, rgba(255, 255, 245, 0.75) 0%, rgba(226, 219, 209, 0) 100%);
+            box-shadow: inset 0 -80px 100px rgba(0,0,0,0.06), inset 0 0 120px rgba(0,0,0,0.05);
+        }
+
+        /* Ceiling Lighting Rail */
+        .track-light {
+            position: relative;
+            width: 24px;
+            height: 12px;
+            background: #181818;
+            border-radius: 3px 3px 8px 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+        }
+        .track-light::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 16px;
+            height: 3px;
+            background: #fffcee;
+            border-radius: 50%;
+            filter: blur(1.5px);
+            box-shadow: 0 0 10px 4px rgba(255, 250, 210, 0.85);
+        }
+
+        /* Matted Museum Canvas Frame (Reference-Accurate) */
+        .gallery-frame-canvas {
+            background-color: #fcfbf8;
+            border: 1px solid #d3cbc0;
+            box-shadow: 
+                0 16px 32px rgba(45, 35, 25, 0.12), 
+                0 4px 8px rgba(45, 35, 25, 0.06),
+                inset 0 0 0 1px #ffffff,
+                inset 0 0 0 5px #ebe5da;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        /* Reading Drawer Directly Under Each Frame */
+        .reading-drawer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            opacity: 0;
+            background: #f7f4ed;
+            border-top: 1px dashed #dcd4c6;
+        }
+        .reading-drawer.open {
+            max-height: 240px;
+            opacity: 1;
+            padding-top: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Adhesive Sticky Notes */
+        .museum-sticky {
+            background-color: #fae88a;
+            color: #2b2416;
+            box-shadow: 2px 8px 16px rgba(50, 40, 20, 0.18);
+            border-top: 2px solid rgba(255,255,255,0.4);
+        }
+
+        /* Pedestal Ledge 3D Effect */
+        .pedestal-plinth {
+            background: linear-gradient(180deg, #1b2838 0%, #121c27 100%);
+            border: 3px solid #ede8de;
+            box-shadow: 0 16px 36px rgba(0,0,0,0.3);
+        }
+        .pedestal-step {
+            background: #d4cdc1;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.7), 0 6px 14px rgba(0,0,0,0.15);
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #a0aec0; border-radius: 20px; }
+    </style>
+</head>
+<body class="w-screen h-screen overflow-hidden relative">
+
+    <!-- TOP NAVIGATION BAR (Always visible above the gallery, fixed height 4rem/64px) -->
+    <header class="fixed top-0 left-0 right-0 h-16 z-50 px-6 flex items-center justify-between border-b border-white/10 bg-gallery-900/90 backdrop-blur-md shadow-lg">
+        <div class="flex items-center space-x-3 cursor-pointer">
+            <div class="w-9 h-9 rounded-full border border-gallery-gold/60 flex items-center justify-center bg-gallery-gold/10 text-gallery-gold font-serif font-bold text-sm">M</div>
+            <div>
+                <h1 class="text-sm font-cinzel tracking-wider text-slate-100 font-bold uppercase">Museum of Promised Efficiencies</h1>
+                <p class="text-[10px] text-gallery-gold tracking-widest uppercase">Guided Document Tour</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2">
+            <!-- Audio Toggle (Optional Ambience) -->
+            <button id="audio-toggle-btn" class="px-3 py-1.5 rounded-full border border-white/15 bg-white/5 hover:bg-white/10 text-slate-300 transition flex items-center space-x-2 text-xs">
+                <svg id="audio-icon-off" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>
+                <span id="audio-status-text" class="hidden sm:inline">Ambience Off</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- LANDING PAGE (Starts exactly below the 4rem header) -->
+    <div id="landing-page" class="absolute top-16 inset-x-0 bottom-0 z-40 bg-gallery-950 flex items-center justify-center overflow-hidden transition-all duration-700">
+        <!-- Background Image Reference -->
+        <div id="landing-bg" class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 ease-out" style="background-image: url('Technostress.png');">
+            <div class="w-full h-full bg-gradient-to-t from-gallery-950 via-black/50 to-black/70"></div>
+        </div>
+
+        <div class="relative z-10 text-center max-w-2xl px-6 py-10 bg-gallery-950/80 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl">
+            <span class="text-gallery-gold tracking-[0.25em] text-xs uppercase font-cinzel font-semibold">Exhibition Wing &bull; Front Door</span>
+            <h2 class="text-3xl md:text-5xl font-serif font-bold text-white mt-2 mb-4 leading-tight">
+                The Museum of<br/><span class="italic text-gallery-goldLight">Promised Efficiencies</span>
+            </h2>
+            <p class="text-slate-300 text-sm md:text-base font-light leading-relaxed mb-6 max-w-lg mx-auto">
+                A guided documentary tour mapping forty years of technostress. Every system was sold as a solution. Every rollout, a reckoning.
+            </p>
+            <button onclick="startTour()" class="px-8 py-3.5 bg-gradient-to-r from-gallery-gold to-yellow-600 hover:scale-105 text-gallery-950 font-bold rounded-full shadow-lg transition font-cinzel text-xs tracking-wider uppercase">
+                Enter Exhibition
+            </button>
+        </div>
+    </div>
+
+    <!-- UI Overlay Navigation Controls (Hidden by default) -->
+    <div id="ui-layer" class="absolute top-20 right-6 z-50 opacity-0 pointer-events-none transition-opacity duration-700 flex space-x-2">
+        <button onclick="prevRoom()" class="pointer-events-auto bg-[#1b2838]/80 hover:bg-[#1b2838] text-white border border-white/20 px-4 py-2 rounded shadow-lg text-xs font-serif uppercase tracking-wider backdrop-blur-md transition flex items-center space-x-1">
+            <span>&larr; Prev</span>
+        </button>
+        <button onclick="nextRoom()" class="pointer-events-auto bg-[#1b2838]/80 hover:bg-[#1b2838] text-white border border-white/20 px-4 py-2 rounded shadow-lg text-xs font-serif uppercase tracking-wider backdrop-blur-md transition flex items-center space-x-1">
+            <span>Next &rarr;</span>
+        </button>
+    </div>
+
+    <!-- ZOOMED ROOM DETAIL OVERLAY (Physical Exhibition Wall Aesthetic) -->
+    <!-- Confined to top-16 so it never overlaps with the header -->
+    <div id="room-detail-overlay" class="absolute top-16 inset-x-0 bottom-0 z-30 opacity-0 pointer-events-none flex flex-col items-center justify-between px-6 pt-8 pb-4 overflow-y-auto bg-[#e2dbd1] text-[#1a232f] custom-scrollbar">
+        
+        <!-- Wall Spotlights Layer -->
+        <div class="absolute inset-0 museum-wall-bg pointer-events-none z-0"></div>
+
+        <!-- Ceiling Track Lighting -->
+        <div class="absolute top-0 left-0 right-0 h-3.5 bg-[#141414] border-b border-[#282828] z-20 flex justify-between px-16 md:px-32 items-center pointer-events-none">
+            <div class="track-light"></div>
+            <div class="track-light -rotate-6"></div>
+            <div class="track-light"></div>
+            <div class="track-light rotate-6"></div>
+            <div class="track-light"></div>
+        </div>
+
+        <!-- Header Block -->
+        <div id="detail-header-bar" class="relative z-10 w-full max-w-6xl flex items-center justify-between mb-6 mt-4">
+            <div class="flex items-center space-x-6 mx-auto">
+                <div id="detail-room-badge" class="w-14 h-14 md:w-16 md:h-16 rounded-full bg-[#1b2838] text-white flex items-center justify-center text-3xl font-serif font-bold shadow-xl border-2 border-[#fffaf0] shrink-0">
+                    0
+                </div>
+                <div>
+                    <h2 id="detail-title" class="text-xl sm:text-2xl md:text-4xl font-serif font-bold tracking-tight text-[#1b2838] uppercase leading-none">
+                        THE THEORY GALLERY:
+                    </h2>
+                    <div class="flex items-center space-x-3 mt-1.5">
+                        <span id="detail-subtitle" class="text-xs md:text-sm font-serif tracking-widest text-[#2c3d4f] font-semibold uppercase">
+                            40 YEARS OF TECHNOSTRESS RESEARCH
+                        </span>
+                        <span class="text-[10px] text-[#1b2838]">◆</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Matrix Badges (Top-Right) -->
+            <div id="detail-impact-badges" class="hidden lg:flex flex-col space-y-1.5 text-right absolute right-0 top-0">
+                <!-- Injected via JavaScript -->
+            </div>
+        </div>
+
+        <!-- Main Exhibition Grid: Left Frames | Center Canvas | Right Frames -->
+        <div class="relative z-10 w-full max-w-7xl flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start px-2 my-auto">
+            
+            <!-- Left Column: Frames 1 & 2 -->
+            <div class="lg:col-span-3 flex flex-col space-y-5">
+                <!-- Frame 1 -->
+                <div class="flex flex-col">
+                    <div id="frame-card-0" class="gallery-frame-canvas p-4 rounded-sm">
+                        <div class="flex items-start space-x-2.5 mb-2">
+                            <span id="frame-num-0" class="bg-[#1b2838] text-white text-xs font-serif font-bold w-5 h-5 flex items-center justify-center shrink-0">1</span>
+                            <h4 id="frame-title-0" class="font-serif font-bold text-xs md:text-sm text-[#1b2838] leading-tight">Title</h4>
+                        </div>
+                        <p id="frame-desc-0" class="text-[11px] text-[#4d5763] leading-relaxed mb-3 font-sans">Summary</p>
+                        <div class="w-full h-32 bg-[#e5e0d8] border border-[#d2cabf] overflow-hidden mb-2 rounded-sm">
+                            <img id="frame-img-0" src="" alt="Case Evidence" class="w-full h-full object-cover opacity-90">
+                        </div>
+                        <div class="flex items-center justify-between text-[10px] pt-1">
+                            <span id="frame-source-0" class="italic font-serif text-[#68707a]">Source</span>
+                            <button onclick="toggleCardReader(0)" class="uppercase tracking-wider font-bold text-[#1b2838] hover:underline flex items-center space-x-1">
+                                <span>Read More</span>
+                                <svg id="arrow-icon-0" class="w-3 h-3 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Reading Drawer -->
+                    <div id="drawer-0" class="reading-drawer text-left px-4">
+                        <p id="citation-text-0" class="text-[11px] font-serif text-[#374151] leading-relaxed mb-3"></p>
+                        <a id="source-link-0" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center text-[10px] font-bold text-[#1b2838] bg-[#ebe4d8] hover:bg-[#dfd5c5] px-3 py-1.5 rounded transition shadow-sm border border-[#d2cabf]">
+                            <span>Open Source Document</span>
+                            <svg class="w-2.5 h-2.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Frame 2 -->
+                <div class="flex flex-col">
+                    <div id="frame-card-1" class="gallery-frame-canvas p-4 rounded-sm">
+                        <div class="flex items-start space-x-2.5 mb-2">
+                            <span id="frame-num-1" class="bg-[#1b2838] text-white text-xs font-serif font-bold w-5 h-5 flex items-center justify-center shrink-0">2</span>
+                            <h4 id="frame-title-1" class="font-serif font-bold text-xs md:text-sm text-[#1b2838] leading-tight">Title</h4>
+                        </div>
+                        <p id="frame-desc-1" class="text-[11px] text-[#4d5763] leading-relaxed mb-3 font-sans">Summary</p>
+                        <div class="w-full h-32 bg-[#e5e0d8] border border-[#d2cabf] overflow-hidden mb-2 rounded-sm">
+                            <img id="frame-img-1" src="" alt="Case Evidence" class="w-full h-full object-cover  opacity-90">
+                        </div>
+                        <div class="flex items-center justify-between text-[10px] pt-1">
+                            <span id="frame-source-1" class="italic font-serif text-[#68707a]">Source</span>
+                            <button onclick="toggleCardReader(1)" class="uppercase tracking-wider font-bold text-[#1b2838] hover:underline flex items-center space-x-1">
+                                <span>Read More</span>
+                                <svg id="arrow-icon-1" class="w-3 h-3 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Reading Drawer -->
+                    <div id="drawer-1" class="reading-drawer text-left px-4">
+                        <p id="citation-text-1" class="text-[11px] font-serif text-[#374151] leading-relaxed mb-3"></p>
+                        <a id="source-link-1" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center text-[10px] font-bold text-[#1b2838] bg-[#ebe4d8] hover:bg-[#dfd5c5] px-3 py-1.5 rounded transition shadow-sm border border-[#d2cabf]">
+                            <span>Open Source Document</span>
+                            <svg class="w-2.5 h-2.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Center Column: Master Canvas & Centerpiece -->
+            <div class="lg:col-span-6 flex flex-col items-center justify-center">
+                
+                <div class="relative w-full max-w-2xl bg-[#14181c] p-2.5 rounded-sm shadow-[0_24px_50px_rgba(0,0,0,0.32)] border-4 border-[#242b33]">
+                    <!-- Central Master Artwork Frame -->
+                    <div class="relative aspect-[16/10] w-full overflow-hidden bg-black">
+                        <img id="detail-main-image" src="" alt="Exhibition Room Visual" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none"></div>
+                    </div>
+
+                    <!-- Sticky Note Tags Attached Over Center Image -->
+                    <!-- <div id="sticky-container"> -->
+                        <!-- Populated dynamically via JS -->
+                    <!-- </div> -->
+                </div>
+
+                <!-- Wall Tagline Plaque Directly Beneath Centerpiece -->
+                <div class="gallery-frame-canvas mt-4 px-6 py-2.5 rounded-sm shadow-md text-center max-w-lg z-10 relative">
+                    <p id="detail-card-tagline" class="text-[13px] font-serif italic text-[#2c3846] leading-snug">
+                        "Behind every go-live is a story the plan didn't capture."
+                    </p>
+                </div>
+            </div>
+
+            <!-- Right Column: Frames 3 & 4 -->
+            <div class="lg:col-span-3 flex flex-col space-y-5">
+                <!-- Frame 3 -->
+                <div class="flex flex-col">
+                    <div id="frame-card-2" class="gallery-frame-canvas p-4 rounded-sm">
+                        <div class="flex items-start space-x-2.5 mb-2">
+                            <span id="frame-num-2" class="bg-[#1b2838] text-white text-xs font-serif font-bold w-5 h-5 flex items-center justify-center shrink-0">3</span>
+                            <h4 id="frame-title-2" class="font-serif font-bold text-xs md:text-sm text-[#1b2838] leading-tight">Title</h4>
+                        </div>
+                        <p id="frame-desc-2" class="text-[11px] text-[#4d5763] leading-relaxed mb-3 font-sans">Summary</p>
+                        <div class="w-full h-32 bg-[#e5e0d8] border border-[#d2cabf] overflow-hidden mb-2 rounded-sm">
+                            <img id="frame-img-2" src="" alt="Case Evidence" class="w-full h-full object-cover  opacity-90">
+                        </div>
+                        <div class="flex items-center justify-between text-[10px] pt-1">
+                            <span id="frame-source-2" class="italic font-serif text-[#68707a]">Source</span>
+                            <button onclick="toggleCardReader(2)" class="uppercase tracking-wider font-bold text-[#1b2838] hover:underline flex items-center space-x-1">
+                                <span>Read More</span>
+                                <svg id="arrow-icon-2" class="w-3 h-3 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Reading Drawer -->
+                    <div id="drawer-2" class="reading-drawer text-left px-4">
+                        <p id="citation-text-2" class="text-[11px] font-serif text-[#374151] leading-relaxed mb-3"></p>
+                        <a id="source-link-2" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center text-[10px] font-bold text-[#1b2838] bg-[#ebe4d8] hover:bg-[#dfd5c5] px-3 py-1.5 rounded transition shadow-sm border border-[#d2cabf]">
+                            <span>Open Source Document</span>
+                            <svg class="w-2.5 h-2.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Frame 4 -->
+                <div class="flex flex-col">
+                    <div id="frame-card-3" class="gallery-frame-canvas p-4 rounded-sm">
+                        <div class="flex items-start space-x-2.5 mb-2">
+                            <span id="frame-num-3" class="bg-[#1b2838] text-white text-xs font-serif font-bold w-5 h-5 flex items-center justify-center shrink-0">4</span>
+                            <h4 id="frame-title-3" class="font-serif font-bold text-xs md:text-sm text-[#1b2838] leading-tight">Title</h4>
+                        </div>
+                        <p id="frame-desc-3" class="text-[11px] text-[#4d5763] leading-relaxed mb-3 font-sans">Summary</p>
+                        <div class="w-full h-32 bg-[#e5e0d8] border border-[#d2cabf] overflow-hidden mb-2 rounded-sm">
+                            <img id="frame-img-3" src="" alt="Case Evidence" class="w-full h-full object-cover  opacity-90">
+                        </div>
+                        <div class="flex items-center justify-between text-[10px] pt-1">
+                            <span id="frame-source-3" class="italic font-serif text-[#68707a]">Source</span>
+                            <button onclick="toggleCardReader(3)" class="uppercase tracking-wider font-bold text-[#1b2838] hover:underline flex items-center space-x-1">
+                                <span>Read More</span>
+                                <svg id="arrow-icon-3" class="w-3 h-3 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Reading Drawer -->
+                    <div id="drawer-3" class="reading-drawer text-left px-4">
+                        <p id="citation-text-3" class="text-[11px] font-serif text-[#374151] leading-relaxed mb-3"></p>
+                        <a id="source-link-3" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center text-[10px] font-bold text-[#1b2838] bg-[#ebe4d8] hover:bg-[#dfd5c5] px-3 py-1.5 rounded transition shadow-sm border border-[#d2cabf]">
+                            <span>Open Source Document</span>
+                            <svg class="w-2.5 h-2.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Architectural Plinth / Pedestal: Core Anchor Statement -->
+        <div id="detail-pedestal" class="relative z-10 w-full max-w-4xl flex flex-col items-center mt-6">
+            <div class="pedestal-plinth w-full px-8 py-4 text-center rounded-sm">
+                <span class="text-[9px] uppercase tracking-[0.25em] font-sans text-amber-200/80 font-bold block mb-1">
+                    Central Exhibition Anchor
+                </span>
+                <p id="detail-anchor-question" class="text-sm md:text-base font-serif italic text-white tracking-wide">
+                    "When does integration become organizational disintegration?"
+                </p>
+            </div>
+            <div class="pedestal-step w-[96%] h-3 rounded-b-sm"></div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Complete Dataset (Rooms 0 through 9) ---
+        const roomsData = [
+    {
+        id: 0,
+        roomNumber: "0",
+        title: "THE THEORY GALLERY:",
+        subtitle: "40 YEARS OF TECHNOSTRESS RESEARCH",
+        badges: [
+            { id: "I", label: "Individual", sub: "User Experience" },
+            { id: "O", label: "Organization", sub: "Workplaces & Systems" },
+            { id: "S", label: "Society", sub: "Institutions & Collective Impacts" }
+        ],
+        centerImage: "./images/room0_center.png",
+        centerQuote: "From the stressed user to strained organizations and societies: the field expands as technologies and consequences evolve.",
+        stickies: [
+            { text: "1984<br>Early computers", pos: "top: 10%; left: -25px; transform: rotate(-4deg);" },
+            { text: "1990s<br>Enterprise systems", pos: "bottom: 12%; left: -25px; transform: rotate(3deg);" },
+            { text: "2010s<br>Mobile & Social", pos: "top: 12%; right: -25px; transform: rotate(4deg);" },
+            { text: "2020s+<br>Technostress 4.0", pos: "bottom: 10%; right: -25px; transform: rotate(-3deg);" }
+        ],
+        pedestalQuestion: "Industry 4.0 technologies give rise to Technostress 4.0: as AI, surveillance and augmentation expand, anxieties about loss of control increasingly travel across individuals, organizations and society.",
+        placards: [
+            {
+                num: "1",
+                title: "Brod (1984): Technostress enters vocabulary",
+                desc: "Craig Brod named technostress as the difficulty of coping with computers, establishing the individual user as the original focus of the field.",
+                img: "./images/room0_left_1.png",
+                source: "Source: Brod, 1984",
+                citation: "Brod, C. (1984). Technostress: The human cost of the computer revolution. Addison-Wesley.",
+                url: "https://search.catalog.loc.gov/instances/07ef210d-003a-5966-af9c-c2447522d306?option=lccn&query=83025866"
+            },
+            {
+                num: "2",
+                title: "Creators and inhibitors",
+                desc: "IS research identified key creators such as techno-overload, invasion, and complexity, alongside organizational inhibitors such as literacy facilitation.",
+                img: "./images/room0_left2.png",
+                source: "Source: Ragu-Nathan et al., 2008",
+                citation: "Ragu-Nathan, T. S., Tarafdar, M., Ragu-Nathan, B. S., & Tu, Q. (2008). The consequences of technostress for end users in organizations. Information Systems Research, 19(4), 417–433.",
+                url: "https://pubsonline.informs.org/doi/10.1287/isre.1070.0165"
+            },
+            {
+                num: "3",
+                title: "Performance, antecedents & social media",
+                desc: "The field expanded to examine performance consequences, mobile constant connectivity, and the dark side of ICT addiction.",
+                img: "./images/room0_right1.png",
+                source: "Source: Salanova et al., 2013",
+                citation: "Salanova, M., Llorens, S., & Cifre, E. (2013). The dark side of technologies: Technostress among users of ICTs. International Journal of Psychology, 48(3), 422–436.",
+                url: "https://onlinelibrary.wiley.com/doi/10.1080/00207594.2012.680460"
+            },
+            {
+                num: "4",
+                title: "Technostress 4.0: Technocontrol & augmentation",
+                desc: "Industry 4.0 brings new strains from algorithmic surveillance, monitoring, AI assistive augmentation, and pervasive autonomy loss.",
+                img: "./images/room0_right2.png",
+                source: "Source: Evenstad, 2025",
+                citation: "Evenstad, S. B. N. (2025). Technocontrol and technoaugmentation stress: Expanding the framework of technostress in response to emerging workplace technologies. APMS, 62–76.",
+                url: "https://link.springer.com/chapter/10.1007/978-3-032-03515-8_5"
+            }
+        ]
+    },
+    {
+        id: 1,
+        roomNumber: "1",
+        title: "ERP / SYSTEM",
+        subtitle: "ROLLOUT TRAUMA",
+        badges: [
+            { id: "O", label: "Primary Impact", sub: "Organizational Strain" },
+            { id: "I", label: "Cross-Level Impact", sub: "Individual Consequences" }
+        ],
+        centerImage: "./images/room1_center.png",
+        centerQuote: "Behind every go-live is a story the plan didn't capture. People absorb the chaos. Systems take the blame.",
+        stickies: [
+            { text: "Integration<br>promise", pos: "top: 15%; left: -25px; transform: rotate(-3deg);" },
+            { text: "Go-live<br>pressure", pos: "top: 55%; left: -25px; transform: rotate(2deg);" },
+            { text: "Invisible<br>workarounds", pos: "bottom: 12%; left: -25px; transform: rotate(-1deg);" },
+            { text: "Process<br>breakdown", pos: "top: 15%; right: -25px; transform: rotate(4deg);" },
+            { text: "Data<br>mistrust", pos: "top: 50%; right: -25px; transform: rotate(-2deg);" },
+            { text: "Organizational<br>strain", pos: "bottom: 15%; right: -25px; transform: rotate(1deg);" }
+        ],
+        pedestalQuestion: "When does integration become organizational disintegration?",
+        placards: [
+            {
+                num: "1",
+                title: "Lidl dumps €500m SAP project",
+                desc: "Lidl abandoned a major SAP rollout after years of cost overruns, complexity and internal turmoil, marking one of the largest ERP write-offs in retail history.",
+                img: "./images/room1_left1.png",
+                source: "Source: Computer Weekly, 2018",
+                citation: "Computer Weekly (2018). Lidl scraps SAP introduction: Retailer halts €500m IT modernization project.",
+                url: "https://www.computerweekly.com/news/252446965/Lidl-dumps-500m-SAP-project"
+            },
+            {
+                num: "2",
+                title: "Hershey's ERP rollout disrupts Halloween orders",
+                desc: "Implementation problems with a new ERP system disrupted orders and shipments during the critical Halloween season, impacting retailers and customers.",
+                img: "./images/room1_left2.png",
+                source: "Source: Computerworld, 2002",
+                citation: "Computerworld (2002). Operational bottlenecks and inventory dispatch paralysis following accelerated SAP R/3 cutover.",
+                url: "https://www.computerworld.com/article/1354366/another-trip-to-hell.html"
+            },
+            {
+                num: "3",
+                title: "Waste Management sues SAP over software failure",
+                desc: "Waste Management filed a lawsuit against SAP after a failed implementation led to significant operational problems and unmet promises, seeking damages.",
+                img: "./images/room1_right1.png",
+                source: "Source: InternetNews, 2008",
+                citation: "InternetNews (2008). Waste Management v. SAP: Multi-million dollar breach of contract claim.",
+                url: "https://www.internetnews.com/news/trash-hauler-sues-sap-over-software-failure/"
+            },
+            {
+                num: "4",
+                title: "Queensland Health payroll disaster",
+                desc: "A new payroll system rollout led to widespread underpayment, overpayment and payroll chaos for thousands of healthcare workers, triggering an official inquiry.",
+                img: "./images/room1_right2.png",
+                source: "Source: Inquiry / press coverage, 2010-2013",
+                citation: "Queensland Health Payroll System Commission of Inquiry (2013). Report on the governance, procurement and implementation disaster.",
+                url: "https://payrollexpertsaustralia.com.au/what-payroll-project-lessons-we-can-learn-from-the-queensland-health-payroll-disaster/"
+            }
+        ]
+    },
+    {
+        id: 2,
+        roomNumber: "2",
+        title: "HEALTHCARE",
+        subtitle: "IT STRAIN",
+        badges: [
+            { id: "O", label: "Primary Impact", sub: "Organizational Strain" },
+            { id: "I", label: "Cross-Level Impact", sub: "Individual Consequences" }
+        ],
+        centerImage: "./images/room2_center.png",
+        centerQuote: "Every time-saving system creates a second layer of checking, correcting, and compensating.",
+        stickies: [
+            { text: "PATIENT CARE ALWAYS", pos: "top: 15%; right: -25px; transform: rotate(3deg);" },
+            { text: "DOCUMENTATION NEVER ENDS", pos: "top: 30%; right: -25px; transform: rotate(-2deg);" },
+            { text: "SAME SYSTEM MORE WORK", pos: "bottom: 20%; left: -25px; transform: rotate(2deg);" }
+        ],
+        pedestalQuestion: "When does digital support become clinical strain?",
+        placards: [
+            {
+                num: "1",
+                title: "Lost in translation: Epic goes to Denmark",
+                desc: "Denmark's experience with Epic raised concerns about importing a healthcare IT system designed for another context, with consequences for workflow and usability.",
+                img: "https://www.politico.com/dims4/default/resize/630/quality/90/format/webp?url=https%3A%2F%2Fstatic.politico.com%2F98%2F48%2F1162d3214ff8a94766eefa755119%2F190606-rigshospitalet-gty-773.jpg",
+                source: "Source: Politico, 2019",
+                citation: "Politico (2019). Lost in translation: Epic goes to Denmark.",
+                url: "https://www.politico.com/story/2019/06/06/epic-denmark-health-1510223"
+            },
+            {
+                num: "2",
+                title: "Finland is considering replacing its version of the Health Platform",
+                desc: "The Finnish Apotti system drew strong criticism, and healthcare organizations began considering alternatives because of safety and usability concerns.",
+                img: "https://sykepleien.no/sites/default/files/styles/article_large_2x_1400x786/public/2026-04/mp6834486-finland-flag-on-button-of-black-keyboard.jpg?h=c0fe9f33&itok=D9UBTsQJ",
+                source: "Source: Sykepleien, 2026",
+                citation: "Sykepleien (2026). Finland is considering replacing its version of the Health Platform.",
+                url: "https://sykepleien.no/2026/04/vurderer-bytte-ut-den-finske-helseplattformen"
+            },
+            {
+                num: "3",
+                title: "Implementing Large-Scale Electronic Health Records",
+                desc: "Research on Epic implementations in Denmark and Finland documents the complexity, strain, and organizational challenges of large-scale EHR deployment.",
+                img: "./images/room2_right1.png",
+                source: "Source: International Journal of Medical Informatics, 2022",
+                citation: "International Journal of Medical Informatics (2022). Implementing Large-Scale Electronic Health Records: Experiences from implementations of Epic in Denmark and Finland.",
+                url: "https://www.sciencedirect.com/science/article/pii/S1386505622001824"
+            },
+            {
+                num: "4",
+                title: "Over 60 notifications about the Health Platform in Helse Midt-Norge",
+                desc: "The State Administrator received over 60 notifications regarding the Health Platform, underscoring concerns about patient safety and work pressures around rollout.",
+                img: "https://sykepleien.no/sites/default/files/styles/media_image/public/2023-01/NTB_73gMdvdkEUM.jpg?h=959d9d2f&itok=KpPusY1s",
+                source: "Source: Sykepleien, 2023",
+                citation: "Sykepleien (2023). Over 60 notifications about the Health Platform in Helse Midt-Norge.",
+                url: "https://sykepleien.no/2023/01/statsforvalteren-har-fatt-over-60-varsler-om-helseplattformen-i-helse-midt-norge"
+            }
+        ]
+    },
+    {
+        id: 3,
+        roomNumber: "3",
+        title: "THE COMPUTER",
+        subtitle: "CANNOT BE WRONG",
+        badges: [
+            { id: "S", label: "Primary Impact", sub: "Societal Disempowerment" },
+            { id: "I", label: "Cross-Level Impact", sub: "Individual Consequences" }
+        ],
+        centerImage: "./images/room3_center.png",
+        centerQuote: "When systems accuse, citizens bear the burden of proving the machine wrong.",
+        stickies: [
+            { text: "AUTOMATION EFFICIENCY OBJECTIVITY", pos: "top: 20%; left: -30px; transform: rotate(-2deg);" },
+            { text: "FASTER FAIRER MORE EFFICIENT", pos: "top: 20%; right: -30px; transform: rotate(3deg);" },
+            { text: "YOUR APPLICATION OUR DECISION", pos: "bottom: 25%; left: -30px; transform: rotate(1deg);" },
+            { text: "PEOPLE POLICIES ALGORITHMS OUTCOMES", pos: "bottom: 25%; right: -30px; transform: rotate(-1deg);" }
+        ],
+        pedestalQuestion: "How do you appeal against a suspicion whose logic you cannot see?",
+        placards: [
+            {
+                num: "1",
+                title: "Post Office Horizon scandal prompts calls for fast and fair redress",
+                desc: "Sub-postmasters were blamed, prosecuted and financially ruined after faulty Horizon data appeared more credible than human testimony.",
+                img: "./images/room3_left1.png",
+                source: "Source: UK Parliament, 2025",
+                citation: "UK Parliament (2025). Post Office Horizon scandal prompts calls for fast and fair redress.",
+                url: "https://committees.parliament.uk/work/8550/post-office-horizon-scandal-fast-and-fair-redress/publications/"
+            },
+            {
+                num: "2",
+                title: "Dutch childcare benefits scandal exposes discriminatory algorithmic profiling",
+                desc: "Automated risk profiling wrongly flagged families as fraud suspects, with nationality used as a factor and devastating consequences for parents.",
+                img: "./images/room3_left2.png",
+                source: "Source: Amnesty International, 2021",
+                citation: "Amnesty International (2021). Dutch childcare benefits scandal exposes discriminatory algorithmic profiling.",
+                url: "https://www.amnesty.org/en/documents/eur35/4686/2021/en/"
+            },
+            {
+                num: "3",
+                title: "Robodebt scandal reveals the cost of automated welfare accusations",
+                desc: "Australia's unlawful automated debt recovery system issued incorrect welfare debts, shifting the burden of proof onto vulnerable citizens.",
+                img: "https://ichef.bbci.co.uk/news/1536/cpsprodpb/9f08/live/7fd9d660-8935-11f0-a128-51c3ef5c6a12.jpg.webp",
+                source: "Source: BBC News, 2023",
+                citation: "BBC News (2023). Robodebt scandal reveals the cost of automated welfare accusations.",
+                url: "https://www.bbc.com/news/articles/clyx3jvk4zeo"
+            },
+            {
+                num: "4",
+                title: "Michigan settles class action over false unemployment fraud accusations",
+                desc: "The MiDAS system falsely accused thousands of fraud, leading to penalties and hardship before meaningful review was possible.",
+                img: "./images/room3_right2.png",
+                source: "Source: Michigan Attorney General, 2022",
+                citation: "Michigan Attorney General (2022). Michigan settles class action over false unemployment fraud accusations.",
+                url: "https://www.michigan.gov/ag/news/press-releases/2022/10/20/som-settlement-of-civil-rights-class-action-alleging-false-accusations-of-unemployment-fraud"
+            }
+        ]
+    },
+    {
+        id: 4,
+        roomNumber: "4",
+        title: "SOCIAL MEDIA HARM /",
+        subtitle: "PLATFORM MANIPULATION",
+        badges: [
+            { id: "S", label: "Primary Impact", sub: "Societal Disempowerment" },
+            { id: "I", label: "Cross-Level Impact", sub: "Individual Consequences" }
+        ],
+        centerImage: "./images/room4_center.png",
+        centerQuote: "When engagement drives the system, harm can travel from the individual psyche to the democratic public sphere.",
+        stickies: [
+            { text: "ENGAGEMENT 2.4M", pos: "top: 15%; left: -25px; transform: rotate(-2deg);" },
+            { text: "TARGETING Age: 17-24...", pos: "top: 15%; right: -25px; transform: rotate(4deg);" },
+            { text: "OUTRAGE 1.2M 86K 204K", pos: "top: 45%; right: -25px; transform: rotate(-1deg);" },
+            { text: "INFLUENCE Amplify content...", pos: "bottom: 25%; right: -25px; transform: rotate(2deg);" }
+        ],
+        pedestalQuestion: "When does connection become manipulation — and a danger to democratic agency?",
+        placards: [
+            {
+                num: "1",
+                title: "Molly Russell case exposes harmful recommendation loops",
+                desc: "The inquest linked a teenager's death to depression and the effects of self-harm and suicide content repeatedly recommended online.",
+                img: "./images/room4_left1.png",
+                source: "Source: UK Judiciary, 2022",
+                citation: "UK Judiciary (2022). Molly Russell inquest findings regarding social media algorithms.",
+                url: "https://www.bbc.com/news/uk-england-london-63254635"
+            },
+            {
+                num: "2",
+                title: "Sextortion schemes turn connection into coercion",
+                desc: "Fake accounts and private messaging were used to manipulate and extort young victims, with devastating consequences.",
+                img: "./images/room4_left2.png",
+                source: "Source: U.S. Department of Justice, 2025",
+                citation: "U.S. Department of Justice (2025). Report on sextortion schemes and platform vulnerability.",
+                url: "https://www.cbsnews.com/detroit/news/nigerian-brothers-sentenced-to-in-sextortion-case-death-of-michigan-teen/"
+            },
+            {
+                num: "3",
+                title: "Cambridge Analytica scandal reveals political microtargeting",
+                desc: "Personal data harvested from social media were used to build voter profiles and target political persuasion at scale.",
+                img: "./images/room4_right1.png",
+                source: "Source: Information Commissioner's Office, 2018",
+                citation: "Information Commissioner's Office (2018). Investigation into the use of data analytics in political campaigns.",
+                url: "https://ico.org.uk/for-the-public/ico-40/cambridge-analytica-raids/"
+            },
+            {
+                num: "4",
+                title: "Troll factory influence operations exploit platform algorithms",
+                desc: "Coordinated fake accounts amplified division, outrage and misinformation through the normal distribution logic of social platforms.",
+                img: "./images/room4_right2.png",
+                source: "Source: U.S. Senate Intelligence Committee, 2019",
+                citation: "U.S. Senate Intelligence Committee (2019). Report on active measures campaigns and interference.",
+                url: "https://www.bbc.com/news/world-us-canada-43419809"
+            }
+        ]
+    },
+    {
+        id: 5,
+        roomNumber: "5",
+        title: "ALGORITHMIC",
+        subtitle: "WORKPLACE CONTROL",
+        badges: [
+            { id: "O", label: "Primary Impact", sub: "Organizational Strain" },
+            { id: "I", label: "Cross-Level Impact", sub: "Individual Consequences" }
+        ],
+        centerImage: "./images/room5_center.png",
+        centerQuote: "When software becomes the supervisor, workers may be measured constantly while understanding very little about how the judgement is produced.",
+        stickies: [
+            { text: "PRODUCTIVITY 92%", pos: "top: 20%; left: -25px; transform: rotate(-3deg);" },
+            { text: "ALERT LOW PRODUCTIVITY", pos: "top: 50%; left: -25px; transform: rotate(2deg);" },
+            { text: "PERFORMANCE ALGORITHM", pos: "bottom: 30%; right: -25px; transform: rotate(-1deg);" },
+            { text: "ATTENDANCE TRACKED", pos: "top: 30%; right: -25px; transform: rotate(3deg);" }
+        ],
+        pedestalQuestion: "Can a worker contest an invisible judgement?",
+        placards: [
+            {
+                num: "1",
+                title: "Amazon warehouse quotas intensify pace and monitoring",
+                desc: "Frontline workers reported constant pressure to work faster, extensive digital monitoring, and signs of burnout under productivity targets and scanner-based control.",
+                img: "./images/room5_left1.png",
+                source: "Source: UIC report / press coverage",
+                citation: "UIC report (press coverage). Amazon warehouse quotas intensify pace and monitoring.",
+                url: "https://cued.uic.edu/news-stories/new-report-pain-points/"
+            },
+            {
+                num: "2",
+                title: "Uber drivers challenge automated deactivation",
+                desc: "Drivers were removed from the platform through automated fraud decisions, raising questions about due process, transparency, and the ability to contest algorithmic dismissal.",
+                img: "./images/room5_left2.png",
+                source: "Source: Worker Info Exchange, 2021",
+                citation: "Worker Info Exchange (2021). Uber drivers challenge automated deactivation.",
+                url: "https://www.workerinfoexchange.org/post/dutch-uk-courts-order-uber-to-reinstate-robo-fired-drivers"
+            },
+            {
+                num: "3",
+                title: "Barclays monitoring software tracks staff activity",
+                desc: "Employee monitoring tools recorded computer activity and time away from desks, prompting criticism that ordinary breaks were being transformed into performance data.",
+                img: "https://i.guim.co.uk/img/media/97dda53145259998eb1f172a83702b575b0543cf/0_307_5500_3300/master/5500.jpg?width=620&dpr=1&s=none&crop=none",
+                source: "Source: The Guardian, 2020",
+                citation: "The Guardian (2020). Barclays monitoring software tracks staff activity.",
+                url: "https://www.theguardian.com/business/2020/feb/20/barlays-using-dytopian-big-brother-tactics-to-spy-on-staff-says-tuc"
+            },
+            {
+                num: "4",
+                title: "Serco Leisure ordered to stop biometric attendance monitoring",
+                desc: "The UK regulator found facial recognition and fingerprint attendance checks for workers disproportionate, highlighting the power imbalance behind workplace biometric surveillance.",
+                img: "./images/room5_right2.png",
+                source: "Source: UK ICO, 2024",
+                citation: "UK Information Commissioner's Office (2024). Enforcement action against Serco Leisure.",
+                url: "https://cy.ico.org.uk/about-the-ico/media-centre/news-and-blogs/2024/02/ico-orders-serco-leisure-to-stop-using-facial-recognition-technology/"
+            }
+        ]
+    },
+    {
+        id: 6,
+        roomNumber: "6",
+        title: "RANSOMWARE / INFILTRATION /",
+        subtitle: "TECHNOSECURITY STRESS",
+        badges: [
+            { id: "S", label: "Primary Impact", sub: "Societal Disruption" },
+            { id: "I", label: "Cross-Level Impact", sub: "Individual Consequences" }
+        ],
+        centerImage: "./images/room6_center.png",
+        centerQuote: "When trust and outsourcing become attack surfaces, organizations and individuals can be exposed.",
+        stickies: [
+            { text: "RANSOMWARE", pos: "top: 20%; left: -25px; transform: rotate(-3deg);" },
+            { text: "SUPPLY CHAIN RISK", pos: "top: 50%; left: -25px; transform: rotate(2deg);" },
+            { text: "INFILTRATION (FAKE IT WORKERS)", pos: "top: 15%; right: -25px; transform: rotate(4deg);" },
+            { text: "PHISHING", pos: "top: 40%; right: -25px; transform: rotate(-2deg);" },
+            { text: "STOLEN DATA EXTORTION", pos: "bottom: 30%; right: -25px; transform: rotate(1deg);" },
+            { text: "SYSTEMS ENCRYPTED", pos: "bottom: 15%; left: -25px; transform: rotate(-1deg);" }
+        ],
+        pedestalQuestion: "When trust, connectivity and outsourcing become attack surfaces, who carries the fear, the blame and the systemic risk?",
+        placards: [
+            {
+                num: "1",
+                title: "Vastaamo: When the ransom targets the patient",
+                desc: "In 2020, the Finnish psychotherapy provider Vastaamo suffered a major data breach. Stolen patient records were used to extort thousands of patients, who received emails threatening to publish their therapy notes unless they paid Bitcoin.",
+                img: "./images/room6_left1.png",
+                source: "Source: Yle, 2020",
+                citation: "Yle (2020). Vastaamo data breach: Extortion emails sent directly to patients.",
+                url: "https://yle.fi/a/3-11612230"
+            },
+            {
+                num: "2",
+                title: "Norsk Hydro: When the digital factory goes back to paper",
+                desc: "In 2019, Norsk Hydro was hit by the LockerGoga ransomware attack, forcing a global shutdown of systems. Many operations reverted to manual processes while IT systems were rebuilt. Hydro refused to pay the ransom and communicated openly about the incident.",
+                img: "https://www.hydro.com/contentassets/e3694c2e3a0d450e92c7fc85f3516d18/cyber-attack-march-2019.jpg?quality=85&width=1032&height=440&rmode=crop&rsampler=bicubic&rxy=0.32,0.66&compand=true",
+                source: "Source: Norsk Hydro, 2019",
+                citation: "Norsk Hydro (2019). Cyber attack incident response and manual operation transition.",
+                url: "https://www.hydro.com/en/global/media/on-the-agenda/cyber-attack/"
+            },
+            {
+                num: "3",
+                title: "DPRK remote IT workers: When the insider was hired legitimately",
+                desc: "U.S. authorities have uncovered schemes where North Korean IT workers used false or stolen identities to obtain legitimate remote jobs, often via intermediaries and 'laptop farms'. The workers gained access to company networks and in some cases stole data or enabled further cyber operations.",
+                img: "./images/room6_right1.png",
+                source: "Source: U.S. Department of Justice, 2025",
+                citation: "U.S. Department of Justice (2025). Advisory on DPRK IT worker infiltration schemes.",
+                url: "https://www.justice.gov/opa/pr/two-north-korean-nationals-and-three-facilitators-indicted-multi-year-fraudulent-remote"
+            },
+            {
+                num: "4",
+                title: "WannaCry: When ransomware becomes geopolitical",
+                desc: "In 2017, the WannaCry ransomware spread globally, disrupting hundreds of thousands of computers. The UK's NHS was severely affected, with many hospitals and GP practices losing access to systems and thousands of appointments and operations cancelled.",
+                img: "./images/room6_right2.png",
+                source: "Source: UK Government, 2017",
+                citation: "UK Government (2017). Investigation into the WannaCry cyber attack and its impact on the NHS.",
+                url: "https://www.bbc.com/news/technology-39901382"
+            }
+        ]
+    },
+    {
+        id: 7,
+        roomNumber: "7",
+        title: "BIASED AI RECRUITMENT",
+        subtitle: "AND EXCLUSION",
+        badges: [
+            { id: "S", label: "Primary Impact", sub: "Societal Disempowerment" },
+            { id: "I", label: "Cross-Level Impact", sub: "Individual Consequences" }
+        ],
+        centerImage: "./images/room7_center.png",
+        centerQuote: "When systems sort people automatically, exclusion can become scalable, opaque and difficult to contest.",
+        stickies: [
+            { text: "CV ANALYSIS", pos: "top: 20%; left: -25px; transform: rotate(-3deg);" },
+            { text: "SKILLS MATCHING", pos: "top: 40%; left: -25px; transform: rotate(1deg);" },
+            { text: "BEHAVIOUR ANALYSIS", pos: "bottom: 30%; left: -25px; transform: rotate(-2deg);" },
+            { text: "IDENTITY VERIFICATION", pos: "bottom: 15%; left: -25px; transform: rotate(2deg);" }
+        ],
+        pedestalQuestion: "Does automation remove bias — or scale it?",
+        placards: [
+            {
+                num: "1",
+                title: "Amazon scraps AI recruiting tool after bias against women emerges",
+                desc: "An experimental hiring model trained on historical resumes learned patterns that disadvantaged women, showing how past inequalities can become automated screening logic.",
+                img: "./images/room7_left1.png",
+                source: "Source: Reuters, 2018",
+                citation: "Reuters (2018). Amazon scraps secret AI recruiting tool that showed bias against women.",
+                url: "https://www.investing.com/news/stock-market-news/amazon-scraps-secret-ai-recruiting-tool-that-showed-bias-against-women-1637988"
+            },
+            {
+                num: "2",
+                title: "iTutorGroup settles case over automated age filtering",
+                desc: "Hiring software automatically rejected older applicants before human review, illustrating how exclusion can be programmed directly into digital screening.",
+                img: "./images/room7_left2.png",
+                source: "Source: U.S. EEOC, 2023",
+                citation: "U.S. Equal Employment Opportunity Commission (2023). iTutorGroup settlement regarding AI age discrimination.",
+                url: "https://www.eeoc.gov/newsroom/eeoc-sues-itutorgroup-age-discrimination"
+            },
+            {
+                num: "3",
+                title: "HireVue drops facial analysis from interview scoring",
+                desc: "Video interview analytics raised concerns about opacity, privacy and bias, prompting criticism of systems that turn faces and behaviour into employability signals.",
+                img: "./images/room7_right1.png",
+                source: "Source: EPIC / HireVue coverage, 2021",
+                citation: "EPIC (2021). Complaint concerning HireVue's facial analysis and biometric evaluation tools.",
+                url: "https://www.washingtonpost.com/technology/2019/11/06/prominent-rights-group-files-federal-complaint-against-ai-hiring-firm-hirevue-citing-unfair-deceptive-practices/"
+            },
+            {
+                num: "4",
+                title: "Remote proctoring systems struggle to recognise darker-skinned users",
+                desc: "Facial detection and identity checks have failed some students, turning automated verification into a barrier to participation and fairness.",
+                img: "./images/room7_right2.png",
+                source: "Source: Incident Database / public reporting",
+                citation: "AI Incident Database. Remote proctoring systems fail to recognize darker-skinned users.",
+                url: "https://oecd.ai/en/incidents/2022-07-15-4ddb"
+            }
+        ]
+    },
+    {
+        id: 8,
+        roomNumber: "8",
+        title: "AI BY DEFAULT",
+        subtitle: "",
+        badges: [
+            { id: "I", label: "Individual Impact", sub: "Personal Consequences" },
+            { id: "O", label: "Operational Impact", sub: "Organizational Change" },
+            { id: "S", label: "Societal Impact", sub: "Systemic Implications" }
+        ],
+        centerImage: "./images/room8_center.png",
+        centerQuote: "AI is entering the tools people already depend on — through updates, defaults, bundles or the choices of others.",
+        stickies: [
+            { text: "Search AI Overview", pos: "top: 25%; left: -25px; transform: rotate(-3deg);" },
+            { text: "Copilot", pos: "bottom: 30%; left: -25px; transform: rotate(2deg);" },
+            { text: "Meta AI", pos: "top: 25%; right: -25px; transform: rotate(3deg);" },
+            { text: "Otter AI Notetaker", pos: "bottom: 30%; right: -25px; transform: rotate(-2deg);" }
+        ],
+        pedestalQuestion: "AI increasingly arrives through updates, defaults, bundles and the choices of other people. Is adoption voluntary when refusal requires leaving the ecosystem?",
+        placards: [
+            {
+                num: "1",
+                title: "Google AI Overviews: When searching automatically becomes asking AI",
+                desc: "AI-generated summaries were inserted into ordinary search. After inaccurate and sometimes bizarre answers went viral, Google made changes to the feature.",
+                img: "./images/room8_left1.png",
+                source: "Source: AP News, 2024",
+                citation: "AP News (2024). Google dials back AI Overviews after bizarre search answers go viral.",
+                url: "https://apnews.com/article/google-ai-overviews-96e763ea2a6203978f581ca9c10f1b07"
+            },
+            {
+                num: "2",
+                title: "Microsoft 365 Copilot: When AI becomes part of the subscription",
+                desc: "Microsoft bundled Copilot AI features into Microsoft 365 Personal and Family plans and raised prices, making AI the new default trajectory of the ecosystem.",
+                img: "./images/room8_left2.png",
+                source: "Source: PCWorld, 2025",
+                citation: "PCWorld (2025). Microsoft integrates Copilot into consumer 365 subscriptions by default.",
+                url: "https://www.wired.com/story/what-is-the-meta-ai-button-in-whatsapp-and-how-do-i-remove-it/"
+            },
+            {
+                num: "3",
+                title: "Meta AI in WhatsApp: When the assistant moves into apps you already use",
+                desc: "Meta embedded AI directly into WhatsApp and other platforms. Users could ignore it, but not easily remove it from the interface.",
+                img: "./images/room8_right1.png",
+                source: "Source: WIRED, 2025",
+                citation: "WIRED (2025). Meta forces its AI chatbot into WhatsApp, Instagram, and Facebook.",
+                url: "https://www.theverge.com/2025/1/16/24345051/microsoft-365-personal-family-copilot-office-ai-price-rises"
+            },
+            {
+                num: "4",
+                title: "Otter AI Notetaker: When someone else brings AI into your meeting",
+                desc: "AI meeting assistants can join Zoom or Teams through another person's calendar connection, turning participants into data subjects even if they never adopted the tool themselves.",
+                img: "./images/room8_right2.png",
+                source: "Source: University guidance / legal reporting, 2025-2026",
+                citation: "University Privacy Guidance (2025-2026). Addressing AI notetaker bots in virtual meetings and classrooms.",
+                url: "https://www.npr.org/2025/08/15/g-s1-83087/otter-ai-transcription-class-action-lawsuit"
+            }
+        ]
+    },
+    {
+        id: 9,
+        roomNumber: "9",
+        title: "WHEN TECHNOLOGY HELPS",
+        subtitle: "FROM INHIBITORS TO TECHNO-EUSTRESS",
+        badges: [
+            { id: "I", label: "Primary Impact", sub: "Individual Empowerment" },
+            { id: "O/S", label: "Cross-Level Impact", sub: "Organizational and Societal Benefits" }
+        ],
+        centerImage: "./images/room9_center.png",
+        centerQuote: "When systems support human agency, technology becomes a resource rather than a source of strain.",
+        stickies: [
+            { text: "Co-designed with patients", pos: "top: 20%; left: -25px; transform: rotate(-3deg);" },
+            { text: "AI Assistant", pos: "bottom: 30%; left: -25px; transform: rotate(2deg);" },
+            { text: "Fatigue status Alertness good", pos: "top: 25%; right: -25px; transform: rotate(3deg);" },
+            { text: "Human insight AI analysis", pos: "bottom: 25%; right: -25px; transform: rotate(-2deg);" }
+        ],
+        pedestalQuestion: "When does technology become a resource rather than a source of strain?",
+        placards: [
+            {
+                num: "1",
+                title: "Portugal's national EHR shows the power of co-design",
+                desc: "A service-design approach involving citizens and health professionals helped produce a widely used national electronic health record. User engagement was treated as part of implementation, not an afterthought.",
+                img: "./images/room9_left1.png",
+                source: "Source: International Journal of Medical Informatics, 2019",
+                citation: "International Journal of Medical Informatics (2019). User-centered design in the development of Portugal's national EHR.",
+                url: "https://www.sciencedirect.com/science/article/pii/S1386505618307767"
+            },
+            {
+                num: "2",
+                title: "AI assistance helps workers learn and perform",
+                desc: "In a large field study of customer-support agents, AI assistance improved productivity and facilitated worker learning, especially for less-experienced staff.",
+                img: "./images/room9_left2.png",
+                source: "Source: Quarterly Journal of Economics, 2025",
+                citation: "Quarterly Journal of Economics (2025). Generative AI at Work: Evidence from customer support agents.",
+                url: "https://academic.oup.com/qje/article/140/2/889/7990658"
+            },
+            {
+                num: "3",
+                title: "Smart fatigue monitoring supports worker safety",
+                desc: "A wearable headband gives workers real-time fatigue warnings and supports proactive safety management in demanding environments.",
+                img: "./images/room9_right1.png",
+                source: "Source: EU-OSHA, 2024",
+                citation: "EU-OSHA (2024). Smart wearables for occupational safety and health monitoring.",
+                url: "https://healthy-workplaces.osha.europa.eu/en/publications/smart-headband-fatigue-risk-monitoring-smart-digital-systems-improving-workers-safety-and-health"
+            },
+            {
+                num: "4",
+                title: "Human expertise and AI combine to detect deepfakes",
+                desc: "Research on gaze patterns and expert judgement informs machine-learning models for more accurate and trustworthy facial image manipulation detection.",
+                img: "./images/room9_right2.png",
+                source: "Source: NTNU PhD research poster, 2026",
+                citation: "NTNU PhD research poster (2026). Human expertise and AI combine to detect deepfakes.",
+                url: "https://www.ntnu.edu/documents/1278705996/1280392722/BhanuShrestha_PhDPlanPoster.pdf/"
+            }
+        ]
+    }
+    ];
+
+        let currentRoomIndex = 0;
+
+        // Populate the DOM elements for the current room
+        function populateRoomDetail(roomIndex) {
+            const data = roomsData[roomIndex];
+
+            // Header Info
+            document.getElementById('detail-room-badge').innerText = data.roomNumber;
+            document.getElementById('detail-title').innerHTML = data.title;
+            document.getElementById('detail-subtitle').innerText = data.subtitle;
+
+            // Badges (Top Right)
+            const badgesContainer = document.getElementById('detail-impact-badges');
+            badgesContainer.innerHTML = data.badges.map(b => `
+                <div class="flex items-center justify-end space-x-2">
+                    <span class="text-[10px] uppercase font-semibold text-[#5a626c] tracking-wider">${b.sub || b.label}</span>
+                    <span class="w-5 h-5 rounded-full bg-[#1b2838] text-white text-[10px] font-serif font-bold flex items-center justify-center">${b.id}</span>
+                </div>
+            `).join('');
+
+            // Center Artwork & Quote
+            document.getElementById('detail-main-image').src = data.centerImage;
+            document.getElementById('detail-card-tagline').innerHTML = `"${data.centerQuote}"`;
+            document.getElementById('detail-anchor-question').innerHTML = `"${data.pedestalQuestion}"`;
+
+            // Stickies on Center Frame
+            // const stickyContainer = document.getElementById('sticky-container');
+            // stickyContainer.innerHTML = data.stickies.map(s => `
+            //     <div class="museum-sticky absolute px-2.5 py-1 text-[10px] font-sans font-semibold tracking-tight rounded-sm border border-amber-300" style="${s.pos}">
+            //         ${s.text}
+            //     </div>
+            // `).join('');
+
+            // Populate the 4 Matted Frames & Reading Drawers
+            data.placards.forEach((p, i) => {
+                document.getElementById(`frame-num-${i}`).innerText = p.num;
+                document.getElementById(`frame-title-${i}`).innerText = p.title;
+                document.getElementById(`frame-desc-${i}`).innerText = p.desc;
+                document.getElementById(`frame-img-${i}`).src = p.img;
+                document.getElementById(`frame-source-${i}`).innerText = p.source;
+                document.getElementById(`citation-text-${i}`).innerText = p.citation;
+                document.getElementById(`source-link-${i}`).href = p.url;
+                
+                // Ensure drawers are closed when changing rooms
+                document.getElementById(`drawer-${i}`).classList.remove('open');
+                document.getElementById(`arrow-icon-${i}`).classList.remove('rotate-180');
+            });
+        }
+
+        // Drawer Toggle Logic
+        function toggleCardReader(index) {
+            const drawer = document.getElementById(`drawer-${index}`);
+            const arrow = document.getElementById(`arrow-icon-${index}`);
+            const isOpen = drawer.classList.contains('open');
+
+            // Close all others
+            for (let i = 0; i < 4; i++) {
+                document.getElementById(`drawer-${i}`).classList.remove('open');
+                document.getElementById(`arrow-icon-${i}`).classList.remove('rotate-180');
+            }
+
+            if (!isOpen) {
+                drawer.classList.add('open');
+                arrow.classList.add('rotate-180');
+            }
+        }
+
+        // Cinematic GSAP Tour Transitions
+        function startTour() {
+            // Blur and fade out the landing page
+            gsap.to('#landing-page', { 
+                opacity: 0, 
+                filter: "blur(15px)", 
+                duration: 1, 
+                onComplete: () => {
+                    const landing = document.getElementById('landing-page');
+                    landing.style.display = 'none';
+                    landing.classList.add('pointer-events-none');
+                    
+                    // Setup Room 0
+                    currentRoomIndex = 0;
+                    populateRoomDetail(currentRoomIndex);
+                    
+                    // Reveal the room overlay and navigation buttons
+                    const roomOverlay = document.getElementById('room-detail-overlay');
+                    roomOverlay.classList.remove('opacity-0', 'pointer-events-none');
+                    document.getElementById('ui-layer').classList.remove('opacity-0', 'pointer-events-none');
+                    
+                    // Walk in effect
+                    gsap.fromTo(roomOverlay, 
+                        { opacity: 0, filter: "blur(25px)", scale: 1.05 }, 
+                        { opacity: 1, filter: "blur(0px)", scale: 1, duration: 1.5, ease: "power2.out" }
+                    );
+                }
+            });
+        }
+
+        // Cross-blur transition for walking between rooms
+        function transitionToRoom(newIndex) {
+            if (newIndex < 0 || newIndex >= roomsData.length || newIndex === currentRoomIndex) return;
+            
+            const roomOverlay = document.getElementById('room-detail-overlay');
+            
+            // Step 1: Walk out (Fade out, blur heavily, slight scale up/push forward)
+            gsap.to(roomOverlay, {
+                opacity: 0,
+                filter: "blur(20px)",
+                scale: 1.03,
+                duration: 0.6,
+                ease: "power2.in",
+                onComplete: () => {
+                    
+                    // Step 2: Swap the content instantly while invisible
+                    currentRoomIndex = newIndex;
+                    populateRoomDetail(newIndex);
+                    
+                    // Step 3: Walk in (Reset scale, unblur, fade in)
+                    gsap.fromTo(roomOverlay, 
+                        { opacity: 0, filter: "blur(20px)", scale: 0.97 },
+                        { opacity: 1, filter: "blur(0px)", scale: 1, duration: 0.8, ease: "power2.out" }
+                    );
+                }
+            });
+        }
+
+        function nextRoom() { 
+            if (currentRoomIndex < roomsData.length - 1) transitionToRoom(currentRoomIndex + 1); 
+        }
+
+        function prevRoom() { 
+            if (currentRoomIndex > 0) transitionToRoom(currentRoomIndex - 1); 
+        }
+
+        // Keyboard Controls
+        document.addEventListener('keydown', (e) => {
+            const landing = document.getElementById('landing-page');
+            // Disable hotkeys if landing page is still visible
+            if (landing && landing.style.display !== 'none' && !landing.classList.contains('hidden')) return;
+            
+            if (e.key === 'ArrowRight' || e.code === 'Space') { 
+                e.preventDefault(); 
+                nextRoom(); 
+            } else if (e.key === 'ArrowLeft') { 
+                e.preventDefault(); 
+                prevRoom(); 
+            }
+        });
+
+        // Optional Ambient Audio Logic
+        let audioCtx, isAudioPlaying = false;
+        document.getElementById('audio-toggle-btn').addEventListener('click', () => {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const statusText = document.getElementById('audio-status-text');
+            if (!isAudioPlaying) {
+                const osc = audioCtx.createOscillator();
+                const filter = audioCtx.createBiquadFilter();
+                window.ambientGain = audioCtx.createGain();
+
+                osc.type = 'sine'; osc.frequency.value = 55;
+                filter.type = 'lowpass'; filter.frequency.value = 140;
+                window.ambientGain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+                window.ambientGain.gain.exponentialRampToValueAtTime(0.04, audioCtx.currentTime + 3);
+
+                osc.connect(filter); filter.connect(window.ambientGain); window.ambientGain.connect(audioCtx.destination);
+                osc.start(); window.ambientOsc = osc;
+                
+                isAudioPlaying = true;
+                statusText.innerText = "Ambience On";
+                document.getElementById('audio-icon-off').innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>`;
+            } else {
+                window.ambientGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.8);
+                setTimeout(() => { window.ambientOsc.stop(); isAudioPlaying = false; }, 900);
+                
+                statusText.innerText = "Ambience Off";
+                document.getElementById('audio-icon-off').innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/>`;
+            }
+        });
+    </script>
+</body>
+</html>
