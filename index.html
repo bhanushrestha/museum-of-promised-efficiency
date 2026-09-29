@@ -377,9 +377,6 @@
         <!-- Bottom Architectural Plinth / Pedestal: Core Anchor Statement -->
         <div id="detail-pedestal" class="relative z-10 w-full max-w-4xl flex flex-col items-center mt-6">
             <div class="pedestal-plinth w-full px-8 py-4 text-center rounded-sm">
-                <span class="text-[9px] uppercase tracking-[0.25em] font-sans text-amber-200/80 font-bold block mb-1">
-                    Central Exhibition Anchor
-                </span>
                 <p id="detail-anchor-question" class="text-sm md:text-base font-serif italic text-white tracking-wide">
                     "When does integration become organizational disintegration?"
                 </p>
@@ -388,6 +385,101 @@
         </div>
 
     </div>
+
+<!-- 4. EXIT PAGE / EXHIBITION DOSSIER (Fades in after Room 9) -->
+<div id="exit-page"
+    class="absolute top-16 inset-x-0 bottom-0 z-30 opacity-0 pointer-events-none flex flex-col items-center justify-between p-6 md:p-10 select-none bg-[#ded7cc] text-[#192430] overflow-y-auto">
+
+    <!-- Top Track Fixture & Wall Gradient (Same museum lighting) -->
+    <div class="absolute inset-0 museum-wall-surface pointer-events-none z-0"></div>
+
+    <div class="relative z-10 w-full max-w-5xl flex flex-col items-center my-auto space-y-8">
+
+        <!-- Header -->
+        <div class="text-center">
+            <span class="text-xs uppercase font-serif tracking-[0.25em] text-[#5a626c] font-bold block mb-1">Exhibition
+                Concluded</span>
+            <h2 class="text-3xl md:text-5xl font-serif font-bold text-[#182635] uppercase tracking-wide">
+                The Museum of Promised Efficiencies
+            </h2>
+            <div class="w-24 h-0.5 bg-[#182635] mx-auto mt-3"></div>
+        </div>
+
+        <!-- Main Content: Two Creators + QR Code -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full items-stretch">
+
+            <!-- Creator / Contributor 1 -->
+            <div class="museum-placard p-6 rounded-sm flex flex-col items-center text-center">
+                <div class="w-36 h-36 rounded-full overflow-hidden mb-4 border-2 border-[#182635] shadow-lg">
+                    <!-- Replace with your photo -->
+                    <img src="https://backends.it.ntnu.no/user-profile-service/rest/files/3e1fd525-f5e8-3f9a-84e6-f344ac3e2b4f"
+                        alt="Lead Researcher" class="w-full h-full object-cover">
+                </div>
+                <h4 class="font-serif font-bold text-lg text-[#182635]">Solveig Beyza Narli Evenstad</h4>
+                <span class="text-xs text-[#686f78] uppercase tracking-wider mb-2">Designer and Technostress Researcher</span>
+                <p class="text-xs text-[#4a535e] font-serif leading-relaxed">
+                    NTNU - Norwegian University of Science and Technology
+                    <br>
+                    Department of Industrial Economics and Technology Management, Campus Gjøvik
+                    <br>
+                    SIC.Lab Mediterranee, Universite Cote d'Azur, France
+                </p>
+            </div>
+
+            <!-- Creator / Contributor 2 -->
+            <div class="museum-placard p-6 rounded-sm flex flex-col items-center text-center">
+                <div class="w-36 h-36 rounded-full overflow-hidden mb-4 border-2 border-[#182635] shadow-lg">
+                    <!-- Replace with student / collaborator photo -->
+                    <img src="https://backends.it.ntnu.no/user-profile-service/rest/files/1daa562b-fd6d-3ad3-9cdb-120e95390e42"
+                        alt="Production Assistant" class="w-full h-full object-cover">
+                </div>
+                <h4 class="font-serif font-bold text-lg text-[#182635]">Bhanu Shrestha</h4>
+                <span class="text-xs text-[#686f78] uppercase tracking-wider mb-2">Developer and Researcher</span>
+                <p class="text-xs text-[#4a535e] font-serif leading-relaxed">
+                    Research on Human Cognition and AI for Facial Manipulation Detection
+                    <br>
+                    NTNU - Norwegian University of Science and Technology
+                    <br>
+                    Department of Computer Science, Campus Gjøvik
+                </p>
+            </div>
+
+            <!-- QR Code Section -->
+            <div class="museum-placard p-6 rounded-sm flex flex-col items-center justify-between text-center bg-[#fdfbf7]">
+                <div>
+                    <span class="text-[10px] uppercase font-bold text-amber-800 tracking-widest block mb-1">Interactive
+                        Exhibition</span>
+                    <h4 class="font-serif font-bold text-base text-[#182635] mb-2">Scan for Website</h4>
+                </div>
+            
+                <!-- Dynamic QR Code (Replace data param with your conference/project URL) -->
+                <div class="p-3 bg-white border border-[#d2cbbe] shadow-inner rounded my-2">
+                    <img src="./images/museum-qr.png" alt="Exhibition QR Code" class="w-28 h-28">
+                </div>
+            
+                <div>
+                    <span class="text-[10px] uppercase font-bold text-amber-800 tracking-widest block mb-1">Feedback Form</span>
+                    <h4 class="font-serif font-bold text-base text-[#182635] mb-2">Scan for Feedback</h4>
+                </div>
+                <div class="p-3 bg-white border border-[#d2cbbe] shadow-inner rounded my-2">
+                    <img src="./images/Nettskjema-QR-656425_qr.png" alt="Feedback FormQR Code" class="w-28 h-28">
+                </div>
+            
+            
+            </div>
+
+        </div>
+
+        <!-- Pedestal / Exit Note -->
+        <div class="text-center pt-2">
+            <button onclick="transitionToRoom(0)"
+                class="text-xs font-bold uppercase tracking-widest text-[#182635] hover:underline">
+                ↺ Restart Exhibition Tour
+            </button>
+        </div>
+
+    </div>
+</div>
 
     <script>
         // --- Complete Dataset (Rooms 0 through 9) ---
@@ -453,8 +545,8 @@
     {
         id: 1,
         roomNumber: "1",
-        title: "ERP / SYSTEM",
-        subtitle: "ROLLOUT TRAUMA",
+        title: "ERP SYSTEM ROLLOUT TRAUMA",
+        subtitle: "",
         badges: [
             { id: "O", label: "Primary Impact", sub: "Organizational Strain" },
             { id: "I", label: "Cross-Level Impact", sub: "Individual Consequences" }
@@ -512,8 +604,8 @@
     {
         id: 2,
         roomNumber: "2",
-        title: "HEALTHCARE",
-        subtitle: "IT STRAIN",
+        title: "HEALTHCARE IT STRAIN",
+        subtitle: "",
         badges: [
             { id: "O", label: "Primary Impact", sub: "Organizational Strain" },
             { id: "I", label: "Cross-Level Impact", sub: "Individual Consequences" }
@@ -568,8 +660,8 @@
     {
         id: 3,
         roomNumber: "3",
-        title: "THE COMPUTER",
-        subtitle: "CANNOT BE WRONG",
+        title: "THE COMPUTER CANNOT BE WRONG",
+        subtitle: "",
         badges: [
             { id: "S", label: "Primary Impact", sub: "Societal Disempowerment" },
             { id: "I", label: "Cross-Level Impact", sub: "Individual Consequences" }
@@ -682,8 +774,8 @@
     {
         id: 5,
         roomNumber: "5",
-        title: "ALGORITHMIC",
-        subtitle: "WORKPLACE CONTROL",
+        title: "ALGORITHMIC WORKPLACE CONTROL",
+        subtitle: "",
         badges: [
             { id: "O", label: "Primary Impact", sub: "Organizational Strain" },
             { id: "I", label: "Cross-Level Impact", sub: "Individual Consequences" }
@@ -739,7 +831,7 @@
     {
         id: 6,
         roomNumber: "6",
-        title: "RANSOMWARE / INFILTRATION /",
+        title: "RANSOMWARE / INFILTRATION",
         subtitle: "TECHNOSECURITY STRESS",
         badges: [
             { id: "S", label: "Primary Impact", sub: "Societal Disruption" },
@@ -1067,12 +1159,90 @@
         }
 
         // Cross-blur transition for walking between rooms
+        // function transitionToRoom(newIndex) {
+        //     if (newIndex < 0 || newIndex >= roomsData.length || newIndex === currentRoomIndex) return;
+            
+        //     const roomOverlay = document.getElementById('room-detail-overlay');
+            
+        //     // Step 1: Walk out (Fade out, blur heavily, slight scale up/push forward)
+        //     gsap.to(roomOverlay, {
+        //         opacity: 0,
+        //         filter: "blur(20px)",
+        //         scale: 1.03,
+        //         duration: 0.6,
+        //         ease: "power2.in",
+        //         onComplete: () => {
+                    
+        //             // Step 2: Swap the content instantly while invisible
+        //             currentRoomIndex = newIndex;
+        //             populateRoomDetail(newIndex);
+                    
+        //             // Step 3: Walk in (Reset scale, unblur, fade in)
+        //             gsap.fromTo(roomOverlay, 
+        //                 { opacity: 0, filter: "blur(20px)", scale: 0.97 },
+        //                 { opacity: 1, filter: "blur(0px)", scale: 1, duration: 0.8, ease: "power2.out" }
+        //             );
+        //         }
+        //     });
+        // }
+
         function transitionToRoom(newIndex) {
-            if (newIndex < 0 || newIndex >= roomsData.length || newIndex === currentRoomIndex) return;
-            
+            if (newIndex < 0 || newIndex > roomsData.length || newIndex === currentRoomIndex) return;
+
+
             const roomOverlay = document.getElementById('room-detail-overlay');
-            
-            // Step 1: Walk out (Fade out, blur heavily, slight scale up/push forward)
+            const exitPage = document.getElementById('exit-page');
+            const goingToExit = (newIndex === roomsData.length); // Index 10
+            const leavingExit = (currentRoomIndex === roomsData.length); // Coming back from 10 to 9
+
+            // --- CASE A: Moving from Room 9 to the Exit Page ---
+            if (goingToExit) {
+                gsap.to(roomOverlay, {
+                    opacity: 0,
+                    filter: "blur(20px)",
+                    scale: 1.03,
+                    duration: 0.6,
+                    ease: "power2.in",
+                    onComplete: () => {
+                        roomOverlay.classList.add('pointer-events-none');
+                        exitPage.classList.remove('pointer-events-none');
+                    
+                        currentRoomIndex = newIndex;
+
+                        gsap.fromTo(exitPage, 
+                            { opacity: 0, filter: "blur(20px)", scale: 0.97 },
+                            { opacity: 1, filter: "blur(0px)", scale: 1, duration: 0.8, ease: "power2.out" }
+                        );
+                    }
+                });
+                return;
+            }
+
+            // --- CASE B: Moving backward from Exit Page to Room 9 ---
+            if (leavingExit) {
+                gsap.to(exitPage, {
+                    opacity: 0,
+                    filter: "blur(20px)",
+                    scale: 0.97,
+                    duration: 0.6,
+                    ease: "power2.in",
+                    onComplete: () => {
+                        exitPage.classList.add('pointer-events-none');
+                        roomOverlay.classList.remove('pointer-events-none');
+
+                        currentRoomIndex = newIndex;
+                        populateRoomDetail(newIndex);
+
+                        gsap.fromTo(roomOverlay, 
+                            { opacity: 0, filter: "blur(20px)", scale: 1.03 },
+                            { opacity: 1, filter: "blur(0px)", scale: 1, duration: 0.8, ease: "power2.out" }
+                        );
+                    }
+                });
+                return;
+            }
+
+            // --- CASE C: Standard Room-to-Room Transitions (0 through 9) ---
             gsap.to(roomOverlay, {
                 opacity: 0,
                 filter: "blur(20px)",
@@ -1080,12 +1250,9 @@
                 duration: 0.6,
                 ease: "power2.in",
                 onComplete: () => {
-                    
-                    // Step 2: Swap the content instantly while invisible
                     currentRoomIndex = newIndex;
                     populateRoomDetail(newIndex);
-                    
-                    // Step 3: Walk in (Reset scale, unblur, fade in)
+
                     gsap.fromTo(roomOverlay, 
                         { opacity: 0, filter: "blur(20px)", scale: 0.97 },
                         { opacity: 1, filter: "blur(0px)", scale: 1, duration: 0.8, ease: "power2.out" }
@@ -1094,12 +1261,24 @@
             });
         }
 
+        // function nextRoom() { 
+        //     if (currentRoomIndex < roomsData.length - 1) transitionToRoom(currentRoomIndex + 1); 
+        // }
+
+        // function prevRoom() { 
+        //     if (currentRoomIndex > 0) transitionToRoom(currentRoomIndex - 1); 
+        // }
+
         function nextRoom() { 
-            if (currentRoomIndex < roomsData.length - 1) transitionToRoom(currentRoomIndex + 1); 
+        if (currentRoomIndex <= roomsData.length - 1) {
+            transitionToRoom(currentRoomIndex + 1);
+            } 
         }
 
         function prevRoom() { 
-            if (currentRoomIndex > 0) transitionToRoom(currentRoomIndex - 1); 
+            if (currentRoomIndex > 0) {
+                transitionToRoom(currentRoomIndex - 1);
+            } 
         }
 
         // Keyboard Controls
